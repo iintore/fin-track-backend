@@ -119,6 +119,9 @@ public class ExpenseController {
         if (message.equals(ExpenseService.NOT_FOUND)) {
             return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
         }
+        if (message.equals(ExpenseService.HAS_RECEIPT_LINES)) {
+            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        }
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 }

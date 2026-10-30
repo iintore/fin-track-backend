@@ -15,6 +15,7 @@ import com.fintrack.domain.Merchant;
 import com.fintrack.repository.AccountHolderRepository;
 import com.fintrack.repository.ExpenseRepository;
 import com.fintrack.repository.MerchantRepository;
+import com.fintrack.repository.ReceiptLineRepository;
 
 @Service
 public class ExpenseService {
@@ -27,6 +28,7 @@ public class ExpenseService {
     public static final String DATE_IN_PAST = "Expense date cannot be in the past";
     public static final String MERCHANT_BUSY = "Merchant already has an open expense on that date";
     public static final String STATUS_UPDATED = "Expense status updated successfully";
+    public static final String HAS_RECEIPT_LINES = "That expense has receipt lines, delete them first";
 
     @Autowired
     private ExpenseRepository expenseRepo;
@@ -36,6 +38,9 @@ public class ExpenseService {
 
     @Autowired
     private MerchantRepository merchantRepo;
+
+    @Autowired
+    private ReceiptLineRepository receiptLineRepo;
 
     public List<Expense> getAllExpenses() {
         return expenseRepo.findAll();
@@ -117,10 +122,14 @@ public class ExpenseService {
     }
 
     public String deleteExpense(UUID id) {
-        if (!expenseRepo.existsById(id)) {
+        Optional<Expense> expense = expenseRepo.findById(id);
+        if (expense.isEmpty()) {
             return NOT_FOUND;
         }
-        expenseRepo.deleteById(id);
+        if (receiptLineRepo.existsByExpense(expense.get())) {
+            return HAS_RECEIPT_LINES;
+        }
+        expenseRepo.delete(expense.get());
         return "Expense deleted successfully";
     }
 
