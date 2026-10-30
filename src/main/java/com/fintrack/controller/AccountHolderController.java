@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fintrack.domain.AccountHolder;
@@ -41,6 +42,11 @@ public class AccountHolderController {
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<AccountHolder>> getAllAccountHolders() {
         return new ResponseEntity<>(accountHolderService.getAllAccountHolders(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/by-last-name", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<AccountHolder>> getAccountHoldersByLastName(@RequestParam String lastName) {
+        return new ResponseEntity<>(accountHolderService.getAccountHoldersByLastName(lastName), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")

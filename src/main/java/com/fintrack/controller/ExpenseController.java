@@ -1,5 +1,6 @@
 package com.fintrack.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,9 +16,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fintrack.domain.Expense;
+import com.fintrack.domain.ExpenseStatus;
 import com.fintrack.service.ExpenseService;
 
 @RestController
@@ -44,6 +47,20 @@ public class ExpenseController {
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Expense>> getAllExpenses() {
         return new ResponseEntity<>(expenseService.getAllExpenses(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/by-status", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Expense>> getExpensesByStatus(@RequestParam ExpenseStatus status) {
+        return new ResponseEntity<>(expenseService.getExpensesByStatus(status), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/between", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Expense>> getExpensesBetween(@RequestParam String start, @RequestParam String end) {
+
+        LocalDate startDate = LocalDate.parse(start);
+        LocalDate endDate = LocalDate.parse(end);
+
+        return new ResponseEntity<>(expenseService.getExpensesBetween(startDate, endDate), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")

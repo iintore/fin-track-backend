@@ -32,6 +32,10 @@ public class AccountHolderService {
         return accountHolderRepo.findById(id);
     }
 
+    public List<AccountHolder> getAccountHoldersByLastName(String lastName) {
+        return accountHolderRepo.findByLastNameIgnoreCaseOrderByFirstNameAsc(lastName);
+    }
+
     public String saveAccountHolder(AccountHolder accountHolder) {
         if (walletTaken(accountHolder.getWalletNumber(), null)) {
             return WALLET_TAKEN;

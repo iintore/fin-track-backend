@@ -1,5 +1,6 @@
 package com.fintrack.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,4 +13,6 @@ import com.fintrack.domain.AccountHolder;
 public interface AccountHolderRepository extends JpaRepository<AccountHolder, UUID> {
 
     Optional<AccountHolder> findByWalletNumber(String walletNumber);
+
+    List<AccountHolder> findByLastNameIgnoreCaseOrderByFirstNameAsc(String lastName);
 }

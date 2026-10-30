@@ -1,5 +1,6 @@
 package com.fintrack.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,6 +39,14 @@ public class ExpenseService {
 
     public Optional<Expense> getExpense(UUID id) {
         return expenseRepo.findById(id);
+    }
+
+    public List<Expense> getExpensesByStatus(ExpenseStatus status) {
+        return expenseRepo.findByStatusOrderBySpendDateAsc(status);
+    }
+
+    public List<Expense> getExpensesBetween(LocalDate start, LocalDate end) {
+        return expenseRepo.findBySpendDateBetweenOrderBySpendDateAsc(start, end);
     }
 
     public String saveExpense(Expense expense) {
