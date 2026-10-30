@@ -45,6 +45,10 @@ public class MerchantService {
         return merchantRepo.findById(id);
     }
 
+    public List<Merchant> getMerchantsByExpenseCategory(String name) {
+        return merchantRepo.findMerchantsByExpenseCategoryName(name);
+    }
+
     @Transactional
     public String saveMerchant(Merchant merchant) {
         String problem = attachStallAndCategories(merchant, merchant);

@@ -28,6 +28,10 @@ public class StallService {
         return stallRepo.findAll();
     }
 
+    public List<Stall> getFreeStalls() {
+        return stallRepo.findFreeStalls();
+    }
+
     public Optional<Stall> getStall(UUID id) {
         return stallRepo.findById(id);
     }

@@ -39,6 +39,11 @@ public class ExpenseCategoryController {
         return new ResponseEntity<>(expenseCategoryService.getAllExpenseCategories(), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/unused", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ExpenseCategory>> getUnusedExpenseCategories() {
+        return new ResponseEntity<>(expenseCategoryService.getUnusedExpenseCategories(), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> getExpenseCategory(@PathVariable UUID id) {
 

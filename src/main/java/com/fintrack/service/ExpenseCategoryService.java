@@ -27,6 +27,10 @@ public class ExpenseCategoryService {
         return expenseCategoryRepo.findAll();
     }
 
+    public List<ExpenseCategory> getUnusedExpenseCategories() {
+        return expenseCategoryRepo.findUnusedExpenseCategories();
+    }
+
     public Optional<ExpenseCategory> getExpenseCategory(UUID id) {
         return expenseCategoryRepo.findById(id);
     }

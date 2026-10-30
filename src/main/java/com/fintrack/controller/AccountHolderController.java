@@ -49,6 +49,17 @@ public class AccountHolderController {
         return new ResponseEntity<>(accountHolderService.getAccountHoldersByLastName(lastName), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/of-merchant/{merchantId}")
+    public ResponseEntity<?> getAccountHoldersOfMerchant(@PathVariable UUID merchantId) {
+
+        Optional<List<AccountHolder>> accountHolders = accountHolderService.getAccountHoldersOfMerchant(merchantId);
+
+        if (accountHolders.isEmpty()) {
+            return new ResponseEntity<>(AccountHolderService.MERCHANT_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(accountHolders.get(), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> getAccountHolder(@PathVariable UUID id) {
 

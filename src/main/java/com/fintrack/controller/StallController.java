@@ -43,6 +43,11 @@ public class StallController {
         return new ResponseEntity<>(stallService.getAllStalls(), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/free", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Stall>> getFreeStalls() {
+        return new ResponseEntity<>(stallService.getFreeStalls(), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> getStall(@PathVariable UUID id) {
 

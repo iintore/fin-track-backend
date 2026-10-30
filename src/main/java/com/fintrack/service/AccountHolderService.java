@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.fintrack.domain.AccountHolder;
 import com.fintrack.repository.AccountHolderRepository;
 import com.fintrack.repository.ExpenseRepository;
+import com.fintrack.repository.MerchantRepository;
 
 @Service
 public class AccountHolderService {
@@ -17,12 +18,16 @@ public class AccountHolderService {
     public static final String NOT_FOUND = "The account holder with that id does not exist";
     public static final String WALLET_TAKEN = "An account holder with that walletNumber already exists";
     public static final String IN_USE = "That account holder has expenses";
+    public static final String MERCHANT_NOT_FOUND = "The merchant with that id does not exist";
 
     @Autowired
     private AccountHolderRepository accountHolderRepo;
 
     @Autowired
     private ExpenseRepository expenseRepo;
+
+    @Autowired
+    private MerchantRepository merchantRepo;
 
     public List<AccountHolder> getAllAccountHolders() {
         return accountHolderRepo.findAll();
@@ -34,6 +39,13 @@ public class AccountHolderService {
 
     public List<AccountHolder> getAccountHoldersByLastName(String lastName) {
         return accountHolderRepo.findByLastNameIgnoreCaseOrderByFirstNameAsc(lastName);
+    }
+
+    public Optional<List<AccountHolder>> getAccountHoldersOfMerchant(UUID merchantId) {
+        if (!merchantRepo.existsById(merchantId)) {
+            return Optional.empty();
+        }
+        return Optional.of(accountHolderRepo.findAccountHoldersOfMerchant(merchantId));
     }
 
     public String saveAccountHolder(AccountHolder accountHolder) {
