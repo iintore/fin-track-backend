@@ -26,6 +26,10 @@ public interface ExpenseRepository extends JpaRepository<Expense, UUID> {
 
     boolean existsByMerchantIdAndSpendDateAndStatusNot(UUID merchantId, LocalDate spendDate, ExpenseStatus status);
 
+    long countBySpendDate(LocalDate spendDate);
+
+    long countByStatus(ExpenseStatus status);
+
     @Query("SELECT e.status, COUNT(e) FROM Expense e GROUP BY e.status")
     List<Object[]> countExpensesPerStatus();
 

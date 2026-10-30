@@ -6,6 +6,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +70,18 @@ public class ExpenseController {
         LocalDate endDate = LocalDate.parse(end);
 
         return new ResponseEntity<>(expenseService.getExpensesBetween(startDate, endDate), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/page", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<Expense>> getExpensesPage(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "spendDate,asc") String sort) {
+
+        String[] sortParts = sort.split(",");
+        Sort.Direction direction = sortParts.length > 1 ? Sort.Direction.fromString(sortParts[1]) : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortParts[0]));
+
+        return new ResponseEntity<>(expenseService.getExpensesPage(pageable), HttpStatus.OK);
     }
 
     @GetMapping(value = "/stats/by-status", produces = MediaType.APPLICATION_JSON_VALUE)
