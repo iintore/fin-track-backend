@@ -24,6 +24,10 @@ public class MerchantService {
     public static final String STALL_NOT_FOUND = "The stall with that id does not exist";
     public static final String CATEGORY_NOT_FOUND = "The expense category with that id does not exist";
     public static final String IN_USE = "That merchant has expenses";
+    public static final String CATEGORY_NOT_EXIST = "That expense category does not exist";
+    public static final String ALREADY_HAS_CATEGORY = "The merchant already has that expense category";
+    public static final String STALL_NUMBER_NOT_FOUND = "The stall with that stallNumber does not exist";
+    public static final String STALL_TAKEN = "That stall is taken by another merchant";
 
     @Autowired
     private MerchantRepository merchantRepo;
@@ -47,6 +51,42 @@ public class MerchantService {
 
     public List<Merchant> getMerchantsByExpenseCategory(String name) {
         return merchantRepo.findMerchantsByExpenseCategoryName(name);
+    }
+
+    @Transactional
+    public String addExpenseCategory(UUID merchantId, UUID expenseCategoryId) {
+        Optional<Merchant> merchant = merchantRepo.findById(merchantId);
+        if (merchant.isEmpty()) {
+            return NOT_FOUND;
+        }
+        Optional<ExpenseCategory> expenseCategory = expenseCategoryRepo.findById(expenseCategoryId);
+        if (expenseCategory.isEmpty()) {
+            return CATEGORY_NOT_EXIST;
+        }
+        if (merchant.get().getExpenseCategories().contains(expenseCategory.get())) {
+            return ALREADY_HAS_CATEGORY;
+        }
+        merchant.get().getExpenseCategories().add(expenseCategory.get());
+        merchantRepo.save(merchant.get());
+        return "Expense category added to the merchant";
+    }
+
+    @Transactional
+    public String changeStall(UUID merchantId, int stallNumber) {
+        Optional<Merchant> merchant = merchantRepo.findById(merchantId);
+        if (merchant.isEmpty()) {
+            return NOT_FOUND;
+        }
+        Optional<Stall> stall = stallRepo.findByStallNumber(stallNumber);
+        if (stall.isEmpty()) {
+            return STALL_NUMBER_NOT_FOUND;
+        }
+        if (merchantRepo.existsByStallAndIdNot(stall.get(), merchantId)) {
+            return STALL_TAKEN;
+        }
+        merchant.get().setStall(stall.get());
+        merchantRepo.save(merchant.get());
+        return "Stall changed successfully";
     }
 
     @Transactional

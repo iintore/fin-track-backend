@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -47,6 +48,35 @@ public class MerchantController {
     @GetMapping(value = "/by-expense-category", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Merchant>> getMerchantsByExpenseCategory(@RequestParam String name) {
         return new ResponseEntity<>(merchantService.getMerchantsByExpenseCategory(name), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{merchantId}/expense-categories/{expenseCategoryId}")
+    public ResponseEntity<String> addExpenseCategory(@PathVariable UUID merchantId,
+            @PathVariable UUID expenseCategoryId) {
+
+        String message = merchantService.addExpenseCategory(merchantId, expenseCategoryId);
+
+        if (message.equals(MerchantService.NOT_FOUND) || message.equals(MerchantService.CATEGORY_NOT_EXIST)) {
+            return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+        }
+        if (message.equals(MerchantService.ALREADY_HAS_CATEGORY)) {
+            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    @PatchMapping(value = "/{merchantId}/stall")
+    public ResponseEntity<String> changeStall(@PathVariable UUID merchantId, @RequestParam int stallNumber) {
+
+        String message = merchantService.changeStall(merchantId, stallNumber);
+
+        if (message.equals(MerchantService.NOT_FOUND) || message.equals(MerchantService.STALL_NUMBER_NOT_FOUND)) {
+            return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+        }
+        if (message.equals(MerchantService.STALL_TAKEN)) {
+            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")

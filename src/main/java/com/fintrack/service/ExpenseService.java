@@ -23,6 +23,10 @@ public class ExpenseService {
     public static final String ACCOUNT_HOLDER_NOT_FOUND = "The account holder with that id does not exist";
     public static final String MERCHANT_NOT_FOUND = "The merchant with that id does not exist";
     public static final String REFERENCES_REQUIRED = "Account holder and merchant are required";
+    public static final String DATE_REQUIRED = "Expense date is required";
+    public static final String DATE_IN_PAST = "Expense date cannot be in the past";
+    public static final String MERCHANT_BUSY = "Merchant already has an open expense on that date";
+    public static final String STATUS_UPDATED = "Expense status updated successfully";
 
     @Autowired
     private ExpenseRepository expenseRepo;
@@ -54,9 +58,18 @@ public class ExpenseService {
         if (problem != null) {
             return problem;
         }
-        if (expense.getStatus() == null) {
-            expense.setStatus(ExpenseStatus.PLANNED);
+        if (expense.getSpendDate() == null) {
+            return DATE_REQUIRED;
         }
+        if (expense.getSpendDate().isBefore(LocalDate.now())) {
+            return DATE_IN_PAST;
+        }
+        boolean merchantBusy = expenseRepo.existsByMerchantIdAndSpendDateAndStatusNot(
+                expense.getMerchant().getId(), expense.getSpendDate(), ExpenseStatus.VOIDED);
+        if (merchantBusy) {
+            return MERCHANT_BUSY;
+        }
+        expense.setStatus(ExpenseStatus.PLANNED);
         expenseRepo.save(expense);
         return "Expense saved successfully";
     }
@@ -74,11 +87,33 @@ public class ExpenseService {
         expense.setSpendDate(newData.getSpendDate());
         expense.setDescription(newData.getDescription());
         expense.setAmount(newData.getAmount());
-        if (newData.getStatus() != null) {
-            expense.setStatus(newData.getStatus());
-        }
         expenseRepo.save(expense);
         return "Expense updated successfully";
+    }
+
+    public String changeStatus(UUID id, ExpenseStatus newStatus) {
+        Optional<Expense> found = expenseRepo.findById(id);
+        if (found.isEmpty()) {
+            return NOT_FOUND;
+        }
+        Expense expense = found.get();
+        ExpenseStatus current = expense.getStatus();
+        if (!canMove(current, newStatus)) {
+            return "Cannot change status from " + current + " to " + newStatus;
+        }
+        expense.setStatus(newStatus);
+        expenseRepo.save(expense);
+        return STATUS_UPDATED;
+    }
+
+    private boolean canMove(ExpenseStatus from, ExpenseStatus to) {
+        if (from == ExpenseStatus.PLANNED) {
+            return to == ExpenseStatus.PENDING || to == ExpenseStatus.VOIDED;
+        }
+        if (from == ExpenseStatus.PENDING) {
+            return to == ExpenseStatus.SETTLED || to == ExpenseStatus.VOIDED;
+        }
+        return false;
     }
 
     public String deleteExpense(UUID id) {

@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -38,8 +39,12 @@ public class ExpenseController {
         if (message.equals(ExpenseService.ACCOUNT_HOLDER_NOT_FOUND) || message.equals(ExpenseService.MERCHANT_NOT_FOUND)) {
             return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
         }
-        if (message.equals(ExpenseService.REFERENCES_REQUIRED)) {
+        if (message.equals(ExpenseService.REFERENCES_REQUIRED) || message.equals(ExpenseService.DATE_REQUIRED)
+                || message.equals(ExpenseService.DATE_IN_PAST)) {
             return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+        }
+        if (message.equals(ExpenseService.MERCHANT_BUSY)) {
+            return new ResponseEntity<>(message, HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
@@ -61,6 +66,20 @@ public class ExpenseController {
         LocalDate endDate = LocalDate.parse(end);
 
         return new ResponseEntity<>(expenseService.getExpensesBetween(startDate, endDate), HttpStatus.OK);
+    }
+
+    @PatchMapping(value = "/{id}/status")
+    public ResponseEntity<String> changeStatus(@PathVariable UUID id, @RequestParam ExpenseStatus status) {
+
+        String message = expenseService.changeStatus(id, status);
+
+        if (message.equals(ExpenseService.NOT_FOUND)) {
+            return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+        }
+        if (message.equals(ExpenseService.STATUS_UPDATED)) {
+            return new ResponseEntity<>(message, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping(value = "/{id}")

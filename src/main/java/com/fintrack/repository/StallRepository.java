@@ -1,6 +1,7 @@
 package com.fintrack.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,8 @@ import com.fintrack.domain.Stall;
 public interface StallRepository extends JpaRepository<Stall, UUID> {
 
     boolean existsByStallNumber(int stallNumber);
+
+    Optional<Stall> findByStallNumber(int stallNumber);
 
     boolean existsByStallNumberAndIdNot(int stallNumber, UUID id);
 

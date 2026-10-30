@@ -20,4 +20,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, UUID> {
     List<Expense> findByStatusOrderBySpendDateAsc(ExpenseStatus status);
 
     List<Expense> findBySpendDateBetweenOrderBySpendDateAsc(LocalDate start, LocalDate end);
+
+    boolean existsByMerchantIdAndSpendDateAndStatusNot(UUID merchantId, LocalDate spendDate, ExpenseStatus status);
 }

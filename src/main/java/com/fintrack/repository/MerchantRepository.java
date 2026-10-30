@@ -9,11 +9,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.fintrack.domain.Merchant;
+import com.fintrack.domain.Stall;
 
 @Repository
 public interface MerchantRepository extends JpaRepository<Merchant, UUID> {
 
     boolean existsByStallId(UUID stallId);
+
+    boolean existsByStallAndIdNot(Stall stall, UUID id);
 
     boolean existsByExpenseCategoriesId(UUID expenseCategoryId);
 
