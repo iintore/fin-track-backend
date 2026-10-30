@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fintrack.domain.AccountHolder;
 import com.fintrack.domain.Expense;
@@ -56,6 +57,16 @@ public class ExpenseService {
 
     public List<Expense> getExpensesBetween(LocalDate start, LocalDate end) {
         return expenseRepo.findBySpendDateBetweenOrderBySpendDateAsc(start, end);
+    }
+
+    public List<Object[]> getExpenseCountPerStatus() {
+        return expenseRepo.countExpensesPerStatus();
+    }
+
+    @Transactional
+    public String cancelDayOfMerchant(UUID merchantId, LocalDate date) {
+        int cancelled = expenseRepo.cancelDayOfMerchant(merchantId, date);
+        return cancelled + " expenses cancelled";
     }
 
     public String saveExpense(Expense expense) {

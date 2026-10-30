@@ -68,6 +68,16 @@ public class ExpenseController {
         return new ResponseEntity<>(expenseService.getExpensesBetween(startDate, endDate), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/stats/by-status", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Object[]>> getExpenseCountPerStatus() {
+        return new ResponseEntity<>(expenseService.getExpenseCountPerStatus(), HttpStatus.OK);
+    }
+
+    @PatchMapping(value = "/cancel-day")
+    public ResponseEntity<String> cancelDayOfMerchant(@RequestParam UUID merchantId, @RequestParam String date) {
+        return new ResponseEntity<>(expenseService.cancelDayOfMerchant(merchantId, LocalDate.parse(date)), HttpStatus.OK);
+    }
+
     @PatchMapping(value = "/{id}/status")
     public ResponseEntity<String> changeStatus(@PathVariable UUID id, @RequestParam ExpenseStatus status) {
 
